@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <type_traits>
 #include <stdexcept>
+#include <string>
+#include <iostream>
 
 template<typename T>
 class Vector {
@@ -18,14 +20,14 @@ public:
 
     // Value constructor
     explicit Vector(size_t size) {
-        ptr_ = new T[size];
+        ptr_ = new T[size]();
         size_ = size;
         capacity_ = size;
     }
 
     // Copy constructor
     Vector(const Vector& other) {
-        ptr_ = new T[other.size_];
+        ptr_ = new T[other.capacity_];
         size_ = other.size_;
         capacity_ = other.capacity_;
         for (size_t i = 0; i < size_; ++i) {
@@ -141,6 +143,21 @@ public:
         return size_;
     }
 
+    // reserve()
+    void reserve(size_t new_cap) {
+        if (new_cap <= capacity_) {
+            return;
+        }
+        T* new_ptr = new T[new_cap];
+        for (size_t i = 0; i < size_; ++i) {
+            new_ptr[i] = ptr_[i];
+        }
+        delete[] ptr_;
+        ptr_ = new_ptr;
+        capacity_ = new_cap;
+    }
+
+
     // Allocated space
     size_t capacity() const noexcept {
         return capacity_;
@@ -180,16 +197,22 @@ public:
     }
 
     void resize(size_t count) {
-        if (count != size_) {
-            capacity_ = std::max(capacity_ * 2, count);
-            T* new_ptr = new T[capacity_];
-            size_ = std::min(size_, count);
+        if (count > capacity_) {
+            size_t new_capacity = std::max(capacity_ * 2, count);
+            T* new_ptr = new T[new_capacity];
             for (size_t i = 0; i < size_; ++i) {
                 new_ptr[i] = ptr_[i];
             }
             delete[] ptr_;
             ptr_ = new_ptr;
+            capacity_ = new_capacity;
         }
+        if (count > size_) {
+            for (size_t i = size_; i < count; ++i) {
+                ptr_[i] = T();
+            }
+        }
+        size_ = count;
     }
 
 private:
