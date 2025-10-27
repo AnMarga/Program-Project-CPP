@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
-#include "vector.h"
+#include "../src/vector.h"
+#include "../include/catch.hpp"
 #include <string>
-#include "include/catch.hpp"
 
 TEST_CASE("Simple vector operations") {
     Vector<std::string> v;
